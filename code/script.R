@@ -29,11 +29,11 @@ set.seed(1234)
 # read in line list data for US
 # updated 20200307
 # data from https://github.com/midas-network/COVID-19/tree/master/data/cases/global/line_listings_nihfogarty
-linelist = read.csv('../data/2020_03_07_1800EST_linelist_NIHFogarty.csv')
-yesUS = subset(linelist, country=='USA')
+linelist = read.csv('../data/2020_03_12_1800EST_linelist_NIHFogarty_ed.csv')
+yesUS = subset(linelist, country=='Sweden')
 
 # remove Diamond Princess repatriated cases
-yesUS = yesUS[grep("Diamond",yesUS$summary,invert=T),]
+#yesUS = yesUS[grep("Diamond",yesUS$summary,invert=T),]
 
 # number of travelers that were cases or died
 num.CF = c(
@@ -68,28 +68,28 @@ for(ii in 1:nrow(tsd.natl)){
 colnames(tsd.natl) = 22:(ncol(tsd.natl)+21)
 
 # count up local cases by day in the US
-cases.US.total = c(rep(0,21),ts.natl['US',])
-cases.US.imported =
+cases.Sweden.total = c(rep(0,21),ts.natl['Sweden',])
+cases.Sweden.imported =
   table(
     as.Date(as.character(subset(yesUS,traveler>0)$reporting.date)) -
       as.Date('2019-12-31'))
-tmp = rep(0,length(cases.US.total))
-tmp[as.numeric(names(cases.US.imported))] = cases.US.imported
-cases.US.imported = tmp
+tmp = rep(0,length(cases.Sweden.total))
+tmp[as.numeric(names(cases.Sweden.imported))] = cases.Sweden.imported
+cases.Sweden.imported = tmp
 rm(tmp)
-cases.US.local = pmax(0, cases.US.total - cases.US.imported)
+cases.Sweden.local = pmax(0, cases.Sweden.total - cases.Sweden.imported)
 
 # count up local deaths by day in the US
-deaths.US.total = c(rep(0,21),tsd.natl['US',])
-deaths.US.imported =
+deaths.Sweden.total = c(rep(0,21),tsd.natl['Sweden',])
+deaths.Sweden.imported =
   table(
     as.Date(as.character(subset(yesUS,traveler>0&death>0)$reporting.date)) -
       as.Date('2019-12-31'))
-tmp = rep(0,length(deaths.US.total))
-tmp[as.numeric(names(deaths.US.imported))] = deaths.US.imported
-deaths.US.imported = tmp
+tmp = rep(0,length(deaths.Sweden.total))
+tmp[as.numeric(names(deaths.Sweden.imported))] = deaths.Sweden.imported
+deaths.Sweden.imported = tmp
 rm(tmp)
-deaths.US.local = pmax(0, deaths.US.total - deaths.US.imported)
+deaths.Sweden.local = pmax(0, deaths.Sweden.total - deaths.Sweden.imported)
 
 # sample replicates of how many infections have been imported into the US
 maxUS = 1e4
@@ -143,24 +143,24 @@ for(ii in 1:replicates){
 
 # draw samples of the day on which imported infections arrived
 case.days=vector()
-for(i in 1:length(cases.US.imported)){
-  if(cases.US.imported[i]>0){
+for(i in 1:length(cases.Sweden.imported)){
+  if(cases.Sweden.imported[i]>0){
     if(length(case.days)==0){
-      case.days=rep(i,cases.US.imported[i])
+      case.days=rep(i,cases.Sweden.imported[i])
     }else{
-      case.days=c(case.days,rep(i,cases.US.imported[i]))      
+      case.days=c(case.days,rep(i,cases.Sweden.imported[i]))      
     }
   }
 }
 import.case.density = density(
   case.days,
   from = 1,
-  to = length(cases.US.imported),
-  n = length(cases.US.imported))$y
+  to = length(cases.Sweden.imported),
+  n = length(cases.Sweden.imported))$y
 import.doy = list()
 for(ii in 1:replicates){
   import.doy[[ii]] = sample(
-    1:length(cases.US.imported),
+    1:length(cases.Sweden.imported),
     imports[ii],
     prob=import.case.density,
     replace=T)
@@ -179,7 +179,7 @@ local = foreach(ii = 1:replicates) %do% {
     symp_to_death_mean = 22.3, # mean of time between symptom onset and death
     symp_to_death_sd = 0.42 * 22.3, # std. dev. of time between symptom onset and death
     report_delay_rate = 3, # mean delay between symptoms and reporting
-    stopSimulationDay = 68, # day of year since Jan 1 when simulation stops
+    stopSimulationDay = 78, # day of year since Jan 1 when simulation stops
     repSims = 1, # number of replicates to produce for these parameters
     asympProp = propns.ASCF[ii,1], # proportion of infections that are asymptomatic
     asympRFraction = 1, # relative infectiousness of asymptomatics
@@ -260,7 +260,7 @@ for(ii in 1:nrow(cases.mat)){
   for(jj in 1:ncol(cases.mat)){
     if(cases.mat[ii,jj]){
       p.mat[ii,jj] =
-        rbeta(1,1+cases.US.local[jj],max(1,1+cases.mat[ii,jj]-cases.US.local[jj])) /
+        rbeta(1,1+cases.Sweden.local[jj],max(1,1+cases.mat[ii,jj]-cases.Sweden.local[jj])) /
         sum(propns.ASCF[2:3])
     }
   }
@@ -293,7 +293,7 @@ death.mat = matrix(death.mat.obs, replicates, ncol(death.mat))
 plot(
   as.Date('2019-12-31') + 1:ncol(death.mat),
   apply(death.mat,2,function(ii)median(ii,na.rm=T)),
-  ylim=c(0,max(c(deaths.US.local,death.mat))),col=1,lwd=2,type='l',xaxs='i',yaxs='i',las=1,
+  ylim=c(0,max(c(deaths.Sweden.local,death.mat))),col=1,lwd=2,type='l',xaxs='i',yaxs='i',las=1,
   xlim=as.Date('2019-12-31') + c(31,ncol(death.mat)),
   xlab='Date',ylab='Daily deaths',main='')
 polygon(
@@ -306,7 +306,7 @@ legend("topleft",lty=rep("solid",2),lwd=2,
        legend=c("Data", "Model"),col=c("red","black"),
        bty='n') 
 par(new=T)
-plot(deaths.US.local[31:length(deaths.US.local)],
+plot(deaths.Sweden.local[31:length(deaths.Sweden.local)],
      type='l',lwd=2,col=2,ylim=c(0,6),xaxs='i',yaxs='i',
      xaxt='n',yaxt='n',xlab='',ylab='')
 dev.off()
