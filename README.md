@@ -1,5 +1,7 @@
 # sarscov2_unobserved_example
 
+# ADAPTED FOR SWEDISH DATA
+
 This repository contains code to reproduce results from the following thread on Twitter.
 
 https://twitter.com/TAlexPerkins/status/1237513140578865153
