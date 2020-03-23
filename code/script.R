@@ -179,7 +179,7 @@ local = foreach(ii = 1:replicates) %do% {
     symp_to_death_mean = 22.3, # mean of time between symptom onset and death
     symp_to_death_sd = 0.42 * 22.3, # std. dev. of time between symptom onset and death
     report_delay_rate = 3, # mean delay between symptoms and reporting
-    stopSimulationDay = 78, # day of year since Jan 1 when simulation stops
+    stopSimulationDay = 81, # day of year since Jan 1 when simulation stops
     repSims = 1, # number of replicates to produce for these parameters
     asympProp = propns.ASCF[ii,1], # proportion of infections that are asymptomatic
     asympRFraction = 1, # relative infectiousness of asymptomatics
