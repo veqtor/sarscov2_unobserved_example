@@ -1,5 +1,11 @@
 # sarscov2_unobserved_example
 
+# Forked from  TAlexPerkins and teams work - ADAPTED FOR SWEDISH DATA
+
+# See /figures for results!
+
+From original text:
+
 This repository contains code to reproduce results from the following thread on Twitter.
 
 https://twitter.com/TAlexPerkins/status/1237513140578865153
